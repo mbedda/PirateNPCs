@@ -18,14 +18,14 @@ using Time = UnityEngine.Time;
 
 namespace Oxide.Plugins
 {
-	[Info("PirateNPC", "bmgjet", "0.0.4")]
+	[Info("PirateNPC", "bmgjet", "0.0.8")]
 	[Description("Creates NPC To Patrol Ocean,Skies and Land")]
 	class PirateNPC : RustPlugin
 	{
 		#region Variables
 
 		[PluginReference]
-		private Plugin Kits; 
+		private Plugin Kits;
 		private int piratePlane = 0;
 		private int pirateRHIB = 0;
 		private int pirateRowBoat = 0;
@@ -54,7 +54,7 @@ namespace Oxide.Plugins
 		private List<Vector3> groundnodes = new List<Vector3>();
 		private List<Vector3> roadnodes = new List<Vector3>();
 		private List<Vector3> railnodes = new List<Vector3>();
-		private Dictionary<Vector3,bool> dropnodes = new Dictionary<Vector3, bool>();
+		private Dictionary<Vector3, bool> dropnodes = new Dictionary<Vector3, bool>();
 		private List<PrefabData> footnodes = new List<PrefabData>();
 		private List<PrefabData> Alarmtriggers = new List<PrefabData>();
 		private List<uint> alarmcooldown = new List<uint>();
@@ -79,7 +79,7 @@ namespace Oxide.Plugins
 		private const string autoturretprefab = "assets/prefabs/npc/autoturret/autoturret_deployed.prefab";
 		private const string samsiteprefab = "assets/prefabs/npc/sam_site_turret/sam_site_turret_deployed.prefab";
 		private const string rhibentityprefab = "assets/content/vehicles/boats/rhib/rhib.prefab";
-		private const string rowboatentityprefab  = "assets/content/vehicles/boats/rowboat/rowboat.prefab";
+		private const string rowboatentityprefab = "assets/content/vehicles/boats/rowboat/rowboat.prefab";
 		private const string minientityprefab = "assets/content/vehicles/minicopter/minicopter.entity.prefab";
 		private const string scrapentityprefab = "assets/content/vehicles/scrap heli carrier/scraptransporthelicopter.prefab";
 		private const string horseentityprefab = "assets/rust.ai/nextai/testridablehorse.prefab";
@@ -477,7 +477,7 @@ namespace Oxide.Plugins
 				PirateFootNPCRoam = float.Parse(plugin.Config["Pirate Foot NPC Roam Distance"].ToString());
 				PirateCargoPlane = bool.Parse(plugin.Config["Pirate Plane Event Enabled"].ToString());
 				PiratePlaneflyheight = float.Parse(plugin.Config["Pirate Plane Fly Height"].ToString());
-				PiratePlaneflyspeed =  float.Parse(plugin.Config["Pirate Plane Fly Speed"].ToString());
+				PiratePlaneflyspeed = float.Parse(plugin.Config["Pirate Plane Fly Speed"].ToString());
 				PiratePlaneNPCAmount = int.Parse(plugin.Config["Pirate Plane NPCs Per Drop"].ToString());
 				PiratePlaneNPCDrops = int.Parse(plugin.Config["Pirate Plane Number Of Drops"].ToString());
 				PiratePlaneAllowedDrops = plugin.AllowedMonumentList(plugin.Config["Pirate Plane Allowed Monuments"].ToString());
@@ -614,10 +614,10 @@ namespace Oxide.Plugins
 			Config["NPCs Parachute Decay (sec)"] = 30f;
 			Config["NPCs Parachute Suicide (sec)"] = 600f;
 			Config["NPCs Radio Disable"] = false;
-			Config["NPCs Radio Custom"] = "http://192.168.1.183:9000/?Voice=radio";
-			Config["NPCs Custom Kill Voice"] = "http://192.168.1.183:9000/?Voice=kill";
-			Config["NPCs Custom Death Voice"] = "http://192.168.1.183:9000/?Voice=death";
-			Config["NPCs Custom Warning Voice"] = "http://192.168.1.183:9000/?Voice=warning";
+			Config["NPCs Radio Custom"] = "";
+			Config["NPCs Custom Kill Voice"] = "";
+			Config["NPCs Custom Death Voice"] = "";
+			Config["NPCs Custom Warning Voice"] = "";
 			Config["NPCs Radio Custom Cooldown"] = 10;
 			Config["NPCs Custom Death VoiceCooldown"] = 8;
 			Config["NPCs Custom Kill Voice Cooldown"] = 8;
@@ -638,7 +638,7 @@ namespace Oxide.Plugins
 			Config["Pirates Distance From POI Land"] = 800f;
 			Config["Pirates POI Expires After (sec)"] = 60f;
 			Config["Pirate Base Amount To Spawn"] = 3;
-			Config["Pirate Base Amount Of NPCs"] = 6;
+			Config["Pirate Base Amount Of NPCs"] = 3;
 			Config["Pirate Base NPC Aim Distance"] = 0.6f;
 			Config["Pirate Base NPC Health"] = 150f;
 			Config["Pirate Base NPC Kit"] = "";
@@ -676,11 +676,11 @@ namespace Oxide.Plugins
 			Config["Pirate Events NPC Kit"] = "";
 			Config["Pirate Events NPC Health"] = 120f;
 			Config["Pirate Events NPC AimMulti"] = 0.8f;
-			Config["Pirate Plane Event Enabled"] = true ;
+			Config["Pirate Plane Event Enabled"] = true;
 			Config["Pirate Plane Fly Height"] = 120f;
 			Config["Pirate Plane Fly Speed"] = 40f;
 			Config["Pirate Plane NPCs Per Drop"] = 3f;
-			Config["Pirate Plane Number Of Drops"] = 6f;
+			Config["Pirate Plane Number Of Drops"] = 3f;
 			Config["Pirate Events NPC Spawn Radius"] = 12f;
 			Config["Pirate Events NPC Stationary Radius"] = 4f;
 			Config["Pirate Plane Allowed Monuments"] = "assets/bundled/prefabs/autospawn/monument/harbor/harbor_2.prefab|assets/bundled/prefabs/autospawn/monument/harbor/harbor_1.prefab|assets/bundled/prefabs/autospawn/monument/military_bases/desert_military_base_d.prefab|assets/bundled/prefabs/autospawn/monument/arctic_bases/arctic_research_base_a.prefab|assets/bundled/prefabs/autospawn/monument/xlarge/launch_site_1.prefab|assets/bundled/prefabs/autospawn/monument/large/excavator_1.prefab|assets/bundled/prefabs/autospawn/monument/medium/junkyard_1.prefab|assets/bundled/prefabs/autospawn/monument/large/trainyard_1.prefab|assets/bundled/prefabs/autospawn/monument/large/powerplant_1.prefab|assets/bundled/prefabs/autospawn/monument/large/military_tunnel_1.prefab|assets/bundled/prefabs/autospawn/monument/large/airfield_1.prefab|assets/bundled/prefabs/autospawn/monument/large/water_treatment_plant_1.prefab|assets/bundled/prefabs/autospawn/monument/medium/radtown_small_3.prefab|assets/bundled/prefabs/autospawn/monument/small/mining_quarry_a.prefab|assets/bundled/prefabs/autospawn/monument/small/satellite_dish.prefab|assets/bundled/prefabs/autospawn/monument/small/sphere_tank.prefab|assets/bundled/prefabs/autospawn/monument/small/mining_quarry_b.prefab|assets/bundled/prefabs/autospawn/monument/small/mining_quarry_c.prefab|assets/bundled/prefabs/autospawn/monument/tiny/water_well_d.prefab|assets/bundled/prefabs/autospawn/monument/tiny/water_well_e.prefab|assets/bundled/prefabs/autospawn/monument/tiny/water_well_c.prefab|assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_a.prefab|assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_c.prefab|assets/bundled/prefabs/autospawn/monument/roadside/warehouse.prefab|assets/bundled/prefabs/autospawn/monument/roadside/gas_station_1.prefab|assets/bundled/prefabs/autospawn/monument/roadside/supermarket_1.prefab|assets/bundled/prefabs/autospawn/power substations/small/power_sub_small_2.prefab|assets/bundled/prefabs/autospawn/power substations/small/power_sub_small_1.prefab|assets/bundled/prefabs/autospawn/power substations/big/power_sub_big_2.prefab|assets/bundled/prefabs/autospawn/power substations/big/power_sub_big_1.prefab";
@@ -691,14 +691,16 @@ namespace Oxide.Plugins
 
 		#region Commands
 		[ChatCommand("pirates.count")]
-		private void ActivePiratesCount(BasePlayer player){if (player.IsAdmin){Counterfunction(player); } }
+		private void ActivePiratesCount(BasePlayer player) { if (player.IsAdmin) { Counterfunction(player); } }
 		[ChatCommand("pirates.cargoplane")]
 		private void ManualSpawncargoplane(BasePlayer player) { if (player.IsAdmin) { SpawnPirates(player.transform.position, 9); player.ChatMessage("Calling pirate cargo drop spawn."); } }
 		[ChatCommand("pirates.drop")]
-		private void ManualSpawnFootNPCDrop(BasePlayer player){if (player.IsAdmin)
+		private void ManualSpawnFootNPCDrop(BasePlayer player)
+		{
+			if (player.IsAdmin)
 			{
 				FootPirate pf = SpawnPirates(player.transform.position, 11).GetComponent<FootPirate>();
-				if (pf != null) {pf.movetopoint = player.transform.position; pf.movetopoint.y = TerrainMeta.HeightMap.GetHeight(player.transform.position) + _ServerSettings.PiratePlaneflyheight; player.ChatMessage("Calling pirate cargo drop on your location."); }
+				if (pf != null) { pf.movetopoint = player.transform.position; pf.movetopoint.y = TerrainMeta.HeightMap.GetHeight(player.transform.position) + _ServerSettings.PiratePlaneflyheight; player.ChatMessage("Calling pirate cargo drop on your location."); }
 			}
 		}
 		[ChatCommand("pirates.foot")]
@@ -826,7 +828,7 @@ namespace Oxide.Plugins
 			if (!_ServerSettings.CargoPathBool) { SetupOceanPatrolPath(); } else { seanodes = TerrainMeta.Path.OceanPatrolFar; sealoaded = true; Puts("Loaded " + seanodes.Count.ToString() + " Sea Nodes."); }
 			if (!_ServerSettings.MonumentPathBool) { SetupAirPatrolPath(); } else { airnodes = MonumentPathList(); airloaded = true; }
 			Threads.Add(ServerMgr.Instance.StartCoroutine(GenerateRoadGrid()));
-			timer.Once(2f, () =>{SetupPlanePath();});
+			timer.Once(2f, () => { SetupPlanePath(); });
 			SetupLandPatrolPath();
 			SetupRailPatrolPath();
 			if (_ServerSettings.ShowMapMarkers) { Threads.Add(ServerMgr.Instance.StartCoroutine(MapRoutine())); };
@@ -889,14 +891,14 @@ namespace Oxide.Plugins
 		{
 			if (be.prefabID == 500822506 && _ServerSettings.PirateEventEnabled)
 			{
-				if (Rust.Application.isLoading || !sealoaded || !airloaded || !landloaded || alarmcooldown.Contains(be.net.ID)){return null;}
+				if (Rust.Application.isLoading || !sealoaded || !airloaded || !landloaded || alarmcooldown.Contains(be.net.ID)) { return null; }
 				foreach (PrefabData alarm in Alarmtriggers)
 				{
-					if (Vector3.Distance(be.transform.position, alarm.position) < 1f && PlayersNearbyfunction(be.transform.position,_ServerSettings.PirateEventRadius))
+					if (Vector3.Distance(be.transform.position, alarm.position) < 1f && PlayersNearbyfunction(be.transform.position, _ServerSettings.PirateEventRadius))
 					{
 						uint ID = be.net.ID;
 						alarmcooldown.Add(ID);
-						timer.Once(_ServerSettings.PirateEventCoolDownDelay, () =>{alarmcooldown.Remove(ID);});
+						timer.Once(_ServerSettings.PirateEventCoolDownDelay, () => { alarmcooldown.Remove(ID); });
 						if (alarm.category.Contains("callpirateplane")) { EventCallfunction(0, alarm); }
 						else if (alarm.category.Contains("callpiratestationary")) { EventCallfunction(1, alarm); }
 						else if (alarm.category.Contains("callpiratefoot")) { EventCallfunction(2, alarm); }
@@ -1255,46 +1257,46 @@ namespace Oxide.Plugins
 				}
 			}
 			timer.Once(5f, () =>
-			 {
-				 Vector3 pos = Vector3.zero;
-				 List<Vector3> addpos = new List<Vector3>();
-				 List<ScientistNPC> npcs = new List<ScientistNPC>();
-				 switch (eventtype)
-				 {
-					 case 0:
-						 FootPirate pf = SpawnPirates(seanodes.GetRandom(), 11).GetComponent<FootPirate>();
-						 if (pf != null) { pf.movetopoint = new Vector3(alarm.position.x, TerrainMeta.HeightMap.GetHeight(alarm.position) + _ServerSettings.PiratePlaneflyheight, alarm.position.z); }
-						 break;
-					 case 1:
-						 pos = new Vector3(alarm.position.x, alarm.position.y, alarm.position.z);
-						 for (int i = 0; i < _ServerSettings.PirateEventNPCAmount; i++)
-						 {
-							 Vector3 vector = UnityEngine.Random.insideUnitCircle * _ServerSettings.PirateEventStationaryRadius;
-							 addpos.Add(pos + new Vector3(vector.x, 0, vector.y));
-						 }
-						 npcs = CreateNPCs(_ServerSettings.PirateEventNPCAmount, 10, _ServerSettings.PirateBaseNPCHealth, _ServerSettings.PirateEventNPCKit, _ServerSettings.PirateEventNPCAimMulti, null, addpos);
-						 if (npcs != null) { foreach (ScientistNPC npc in npcs) { npc.NavAgent.isStopped = true; } }
-						 break;
-					 case 2:
-						 pos = new Vector3(alarm.position.x, alarm.position.y, alarm.position.z);
-						 for (int i = 0; i < _ServerSettings.PirateEventNPCAmount; i++){addpos.Add(pos);}
-						 npcs = CreateNPCs(_ServerSettings.PirateEventNPCAmount, 10, _ServerSettings.PirateBaseNPCHealth, _ServerSettings.PirateEventNPCKit, _ServerSettings.PirateEventNPCAimMulti, null, addpos);
-						 timer.Once(2f, () =>
-						 {
-							 if (npcs == null) { return; }
-							 foreach (ScientistNPC npc in npcs) { BailOutfunction(alarm.position, npc, alarm.position, (int)_ServerSettings.PirateEventSpawnRadius, 0, false); }
-						 });
-						 break;
-				 }
-			 });
+			{
+				Vector3 pos = Vector3.zero;
+				List<Vector3> addpos = new List<Vector3>();
+				List<ScientistNPC> npcs = new List<ScientistNPC>();
+				switch (eventtype)
+				{
+					case 0:
+						FootPirate pf = SpawnPirates(seanodes.GetRandom(), 11).GetComponent<FootPirate>();
+						if (pf != null) { pf.movetopoint = new Vector3(alarm.position.x, TerrainMeta.HeightMap.GetHeight(alarm.position) + _ServerSettings.PiratePlaneflyheight, alarm.position.z); }
+						break;
+					case 1:
+						pos = new Vector3(alarm.position.x, alarm.position.y, alarm.position.z);
+						for (int i = 0; i < _ServerSettings.PirateEventNPCAmount; i++)
+						{
+							Vector3 vector = UnityEngine.Random.insideUnitCircle * _ServerSettings.PirateEventStationaryRadius;
+							addpos.Add(pos + new Vector3(vector.x, 0, vector.y));
+						}
+						npcs = CreateNPCs(_ServerSettings.PirateEventNPCAmount, 10, _ServerSettings.PirateBaseNPCHealth, _ServerSettings.PirateEventNPCKit, _ServerSettings.PirateEventNPCAimMulti, null, addpos);
+						if (npcs != null) { foreach (ScientistNPC npc in npcs) { npc.NavAgent.isStopped = true; } }
+						break;
+					case 2:
+						pos = new Vector3(alarm.position.x, alarm.position.y, alarm.position.z);
+						for (int i = 0; i < _ServerSettings.PirateEventNPCAmount; i++) { addpos.Add(pos); }
+						npcs = CreateNPCs(_ServerSettings.PirateEventNPCAmount, 10, _ServerSettings.PirateBaseNPCHealth, _ServerSettings.PirateEventNPCKit, _ServerSettings.PirateEventNPCAimMulti, null, addpos);
+						timer.Once(2f, () =>
+						{
+							if (npcs == null) { return; }
+							foreach (ScientistNPC npc in npcs) { BailOutfunction(alarm.position, npc, alarm.position, (int)_ServerSettings.PirateEventSpawnRadius, 0, false); }
+						});
+						break;
+				}
+			});
 		}
 
 		private List<string> AllowedMonumentList(string settings)
-        {
+		{
 			List<string> list = new List<string>();
 			list.AddRange(settings.Split('|'));
 			return list;
-        }
+		}
 
 		private void Counterfunction(BasePlayer p) { p.ChatMessage("Pirates: RHIB:" + pirateRHIB + " RowBoat:" + pirateRowBoat + " Sub:" + pirateSub + " Mini:" + piratesMini + " Scrap:" + pirateScrap + " Horse:" + pirateHorse + " SnowMobile:" + pirateSnowMobile + " Train:" + pirateRail + " Bases:" + pirateBase + " ActiveNPCs:" + ActiveNPCs.Count); }
 
@@ -1975,7 +1977,7 @@ namespace Oxide.Plugins
 								MapMarkerCustom.alpha = 1;
 								MapMarkerCustom.radius *= 0.5f;
 							}
-							
+
 							MapMarkerCustom.SetParent(be, false, true);
 							if (MapMarkerCustom.transform.position != new Vector3(0, 0, 0)) { mapmarkersList.Add(MapMarkerCustom); }
 						}
@@ -2108,8 +2110,8 @@ namespace Oxide.Plugins
 					foreach (Dictionary<string, string> i in profiles) { foreach (KeyValuePair<string, string> it in i) { newloottable += it.Key + "," + it.Value + "|"; } }
 				}
 				Config["XLootCustomProfiles"] = newloottable;
-				NextFrame(() =>{Config.Save();});
-				timer.Once(1f, () =>{BuildLootTablefunction();});
+				NextFrame(() => { Config.Save(); });
+				timer.Once(1f, () => { BuildLootTablefunction(); });
 			}
 		}
 
@@ -2251,10 +2253,10 @@ namespace Oxide.Plugins
 		}
 
 		private bool collidersbool(Vector3 position)
-        {
+		{
 			List<BuildingBlock> obj = Pool.GetList<BuildingBlock>();
 			Vis.Entities(position, 10, obj, -1);
-			if(obj != null && obj.Count != 0){return true;}
+			if (obj != null && obj.Count != 0) { return true; }
 			return false;
 		}
 
@@ -2266,7 +2268,7 @@ namespace Oxide.Plugins
 				timer.Once(0.1f, () => { if (npc != null) { GroundCheckfunction(npc, home, Chute); } });
 				return;
 			}
-			if(collidersbool(npc.transform.position)){npc.Die();}
+			if (collidersbool(npc.transform.position)) { npc.Die(); }
 			RaycastHit raycastHit;
 			if (Physics.SphereCast(npc.transform.position, 3f, Vector3.down, out raycastHit, 5f, -1) || Physics.SphereCast(npc.transform.position, 3f, Vector3.up, out raycastHit, 5f, -1))
 			{
@@ -2718,11 +2720,11 @@ namespace Oxide.Plugins
 					yield return _instruction;
 				}
 				PrefabData prefabdata0 = World.Serialization.world.prefabs[i];
-                if (prefabdata0.id == 1519652535 && prefabdata0.category.Contains("piratenpcspawner")) { footnodes.Add(prefabdata0); }
-				if (prefabdata0.id == 500822506 && prefabdata0.category.Contains("callpirate")){Alarmtriggers.Add(prefabdata0);}
+				if (prefabdata0.id == 1519652535 && prefabdata0.category.Contains("piratenpcspawner")) { footnodes.Add(prefabdata0); }
+				if (prefabdata0.id == 500822506 && prefabdata0.category.Contains("callpirate")) { Alarmtriggers.Add(prefabdata0); }
 			}
 			if (footnodes.Count != 0) { footloaded = true; }
-			
+
 			Puts("Found " + footnodes.Count.ToString() + " NPC Spawner Nodes. & " + Alarmtriggers.Count.ToString() + " triggers");
 			yield break;
 		}
@@ -2755,15 +2757,15 @@ namespace Oxide.Plugins
 							if (npc.Key == null) continue;
 							if (NPCsUintList.Contains(npc.Key.net.ID)) { NPCsUintList.Remove(npc.Key.net.ID); }
 							if (npc.Key.IsWounded()) { if (!downed.Contains(npc.Key)) { downed.Add(npc.Key); } }
-							if(!npc.Key.IsWounded() && downed.Contains(npc.Key))
-                            {
+							if (!npc.Key.IsWounded() && downed.Contains(npc.Key))
+							{
 								downed.Remove(npc.Key);
 								npc.Key.EquipWeapon();
 							}
 							float groundheightFLOAT = TerrainMeta.HeightMap.GetHeight(npc.Key.transform.position);
 							if (groundheightFLOAT < -2f || npc.Key.transform.position.y < groundheightFLOAT - 2f) { GroundedNPCs.Remove(npc.Key.net.ID); npc.Key.Die(); continue; }
 							if (npc.Value != null) { if (npc.Value.Distance(npc.Key) > 50f) { ActiveNPCs[npc.Key] = null; } }
-							if (npc.Value == null){ActiveNPCs[npc.Key] = npc.Key.Brain.Senses.GetNearestPlayer(50);}
+							if (npc.Value == null) { ActiveNPCs[npc.Key] = npc.Key.Brain.Senses.GetNearestPlayer(50); }
 							if (npc.Value != null && !VoiceUintList.Contains(npc.Value.net.ID)) { npc.Key.Brain.Navigator.SetDestination(ActiveNPCs[npc.Key].transform.position, BaseNavigator.NavigationSpeed.Normal); }
 							else
 							{
@@ -2940,9 +2942,9 @@ namespace Oxide.Plugins
 		private IEnumerator GeneratPlaneGrid()
 		{
 			int droppable = 0;
-			foreach (MonumentInfo pathList in TerrainMeta.Path.Monuments) 
+			foreach (MonumentInfo pathList in TerrainMeta.Path.Monuments)
 			{
-				if (!pathList.IsSafeZone) 
+				if (!pathList.IsSafeZone)
 				{
 					if (dropnodes.ContainsKey(pathList.transform.position)) { continue; }
 					if (_ServerSettings.PiratePlaneAllowedDrops.Contains(pathList.name))
@@ -2950,9 +2952,9 @@ namespace Oxide.Plugins
 						droppable++;
 						dropnodes.Add(pathList.transform.position, true);
 					}
-					else{dropnodes.Add(pathList.transform.position, false);				}
-				} 
-			} 
+					else { dropnodes.Add(pathList.transform.position, false); }
+				}
+			}
 			Puts("Loaded " + dropnodes.Count.ToString() + " Monument nodes. " + droppable.ToString() + " are drop points.");
 			yield break;
 		}
@@ -3277,7 +3279,7 @@ namespace Oxide.Plugins
 				}
 				foreach (uint id in NPCsUintList.ToArray()) { if (!BaseEntity.serverEntities.entityList.Contains(id)) { NPCsUintList.Remove(id); } }
 				FootPirate pf = baseentitybe.GetComponent<FootPirate>();
-				if (pf != null){if (pf.baseentitybe != null && !pf.baseentitybe.IsDestroyed) { pf.baseentitybe.Kill(); }}
+				if (pf != null) { if (pf.baseentitybe != null && !pf.baseentitybe.IsDestroyed) { pf.baseentitybe.Kill(); } }
 				return;
 			}
 			timer.Once(1f, () => { InvalidateCheck(baseentitybe); });
@@ -3342,15 +3344,15 @@ namespace Oxide.Plugins
 					addpos.Add(dropPosition);
 					List<ScientistNPC> npc = CreateNPCs(1, 9, _ServerSettings.PirateFootNPCHealth, _ServerSettings.PirateFootNPCKit, _ServerSettings.PirateFootNPCAimMulti, null, addpos);
 					timer.Once(5f, () =>
-					 {
-						 if(npc != null && npc.Count == 1)
-                         {
-							 if (npc[0] != null)
-							 {
-								 BailOutfunction(dropPosition, npc[0], dropPosition, 3, 0, false);
-							 }
-						 }
-					 });
+					{
+						if (npc != null && npc.Count == 1)
+						{
+							if (npc[0] != null)
+							{
+								BailOutfunction(dropPosition, npc[0], dropPosition, 3, 0, false);
+							}
+						}
+					});
 					return null;
 				case 11:
 					dropPosition = seanodes.GetRandom();
@@ -3491,7 +3493,7 @@ namespace Oxide.Plugins
 							break;
 						case 1:
 							plugin.pirateRowBoat++;
-							BoatTurnSpeedfloat= _ServerSettings.RowBoatBoatTurnSpeed;
+							BoatTurnSpeedfloat = _ServerSettings.RowBoatBoatTurnSpeed;
 							BoatMaxSpeedfloat = _ServerSettings.RowBoatBoatMaxSpeed;
 							NPCAmountint = _ServerSettings.RowBoatNPCAmount;
 							NPCHealthfloat = _ServerSettings.RowBoatNPCHealth;
@@ -4783,7 +4785,7 @@ namespace Oxide.Plugins
 					if (TrainTrackSpline.TryFindTrackNear(_trainCar.transform.position, 10f, out trainTrack, out splineDistance))
 					{
 						TrainTrackSpline currentTrack = trainTrack;
-						if(currentTrack == null) { return; }
+						if (currentTrack == null) { return; }
 						Vector3 lastCheckPosition = currentTrack.GetPosition(splineDistance);
 						Vector3 checkForward = currentTrack.GetTangentCubicHermiteWorld(splineDistance);
 						TrainCar lastSpawnedCar = _trainCar;
@@ -4796,6 +4798,7 @@ namespace Oxide.Plugins
 								if (!plugin.HasSpaceToSpawnfunction(currentTrack, lastCheckPosition)) { break; }
 								Action<TrainCar> disableCoupling = i == _ServerSettings.PirateRailWagonAmount ? new Action<TrainCar>((TrainCar t) => t.rearCoupling = null) : null;
 								char Letter = plugin.GetLetterfunction();
+								if (Letter == 'd') { Letter = 'a'; }
 								if (SpawnEntity(wagonentsprefab.Replace('$', Letter), lastCheckPosition, Quaternion.LookRotation(_trainCar.transform.forward), out activeTrain, disableCoupling))
 								{
 									plugin.BaseParts.Add(activeTrain.net.ID);
@@ -4833,10 +4836,10 @@ namespace Oxide.Plugins
 											plugin.BaseParts.Add(plugin.CreateTurretfunction(new Vector3(-0.808f, 1.546f, -5.566f), new Vector3(0, 90f, 0), activeTrain).net.ID);
 											plugin.CreateLootSpawnerfunction(new Vector3(-0.927f, 1.546f, -0.117f), new Vector3(0, 270f, 0), activeTrain, eliteentityprefab);
 											break;
+										//case 'd':
+										//lugin.BaseParts.Add(plugin.CreateTurretfunction(new Vector3(-0f, 4.85f, -0f), new Vector3(0, 180f, 0), activeTrain).net.ID);
+										//	break;
 										case 'c':
-											plugin.BaseParts.Add(plugin.CreateTurretfunction(new Vector3(-0f, 4.85f, -0f), new Vector3(0, 180f, 0), activeTrain).net.ID);
-											break;
-										case 'd':
 											plugin.BaseParts.Add(plugin.CreateSamsitefunction(new Vector3(0f, 1.4f, 0f), new Vector3(0, 0, 0), activeTrain).net.ID);
 											WagonPos = new Vector3[] { new Vector3(0.9f, 1.5f, 2.5f), };
 											npcs.AddRange(plugin.CreateNPCs(WagonPos.Length, 8, _ServerSettings.PirateRailNPCHealth, _ServerSettings.PirateRailNPCKit, AIShootMultiplyer, activeTrain, WagonPos.ToList()));
@@ -4982,7 +4985,7 @@ namespace Oxide.Plugins
 			public Vector3 movetopoint = Vector3.zero;
 			private bool isRetiring = false;
 			public List<ScientistNPC> npcs = new List<ScientistNPC>();
-			public Dictionary<Vector3,bool> droppoints = plugin.dropnodes;
+			public Dictionary<Vector3, bool> droppoints = plugin.dropnodes;
 			private float NextPOITick;
 			List<Vector3> DropPos = new List<Vector3>();
 			public bool CanDropNext = false;
@@ -5008,10 +5011,10 @@ namespace Oxide.Plugins
 						plane.transform.localPosition += new Vector3(0, -15, 0);
 
 					}
-					for (int i = 0; i <= NPCAmountint; i++){ DropPos.Add(new Vector3(0f, 2.1f, -13.1f));}
+					for (int i = 0; i <= NPCAmountint; i++) { DropPos.Add(new Vector3(0f, 2.1f, -13.1f)); }
 					movetopoint = FindPOIvector();
 					NextPOITick = Time.time;
-					if (Type == 91){NextPOITick = Time.time + 9999;}
+					if (Type == 91) { NextPOITick = Time.time + 9999; }
 					plugin.timer.Once(_ServerSettings.LeaveAfter, () => { Retire(); });
 					plugin.piratePlane++;
 					plugin.PirateUintList.Add(baseentitybe.net.ID);
@@ -5037,13 +5040,13 @@ namespace Oxide.Plugins
 			}
 
 			private bool DropHere(Vector3 position)
-            {
-				if(	npcs == null || npcs.Count == 0) { return false; }
+			{
+				if (npcs == null || npcs.Count == 0) { return false; }
 				float groundheightFLOAT = TerrainMeta.HeightMap.GetHeight(position);
-				if(groundheightFLOAT < 1f){return false;}
-				if (CanDropNext){return true;}
+				if (groundheightFLOAT < 1f) { return false; }
+				if (CanDropNext) { return true; }
 				return false;
-            }
+			}
 
 			Vector3 FindPOIvector()
 			{
@@ -5056,7 +5059,7 @@ namespace Oxide.Plugins
 							if (baseentitybe != null)
 							{
 								List<Vector3> addpos = new List<Vector3>();
-								for (int i = 0; i < _ServerSettings.PirateEventNPCAmount; i++){addpos.Add(new Vector3(0, 2.1f, -13.1f));}
+								for (int i = 0; i < _ServerSettings.PirateEventNPCAmount; i++) { addpos.Add(new Vector3(0, 2.1f, -13.1f)); }
 								npcs = plugin.CreateNPCs(_ServerSettings.PirateEventNPCAmount, 10, _ServerSettings.PirateBaseNPCHealth, _ServerSettings.PirateEventNPCKit, _ServerSettings.PirateEventNPCAimMulti, baseentitybe, addpos);
 							}
 						});
@@ -5135,26 +5138,26 @@ namespace Oxide.Plugins
 						NextPOITick = Time.time + 10;
 						Vector3 POI = plugin.getPOIfunction(baseentitybe.transform.position, _ServerSettings.PiratesAirPOIRadius);
 						if (POI != Vector3.zero)
-						{ 
-							POI.y = TerrainMeta.HeightMap.GetHeight(POI) + _ServerSettings.PiratePlaneflyheight; 
+						{
+							POI.y = TerrainMeta.HeightMap.GetHeight(POI) + _ServerSettings.PiratePlaneflyheight;
 							movetopoint = POI;
 							NextPOITick = Time.time + 120;
 						}
 					}
 				}
-                Vector3 targetDir = movetopoint - transform.position;
-                Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, 5f * Time.deltaTime, 0.0f);
-                Vector3 pos = Vector3.MoveTowards(baseentitybe.transform.position, movetopoint, flyspeedfloat * Time.deltaTime);
-                if (terraincheck < Time.time)
-                {
-                    float terrainheight = TerrainMeta.HeightMap.GetHeight(plane.transform.position);
-                    if (pos.y < terrainheight + flyheightfloat - 5) { pos.y += 2f; }
-                    else if (pos.y > terrainheight + flyheightfloat + 5) { pos.y -= 2f; }
-                    terraincheck = Time.time + 0.5f;
-                }
+				Vector3 targetDir = movetopoint - transform.position;
+				Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, 5f * Time.deltaTime, 0.0f);
+				Vector3 pos = Vector3.MoveTowards(baseentitybe.transform.position, movetopoint, flyspeedfloat * Time.deltaTime);
+				if (terraincheck < Time.time)
+				{
+					float terrainheight = TerrainMeta.HeightMap.GetHeight(plane.transform.position);
+					if (pos.y < terrainheight + flyheightfloat - 5) { pos.y += 2f; }
+					else if (pos.y > terrainheight + flyheightfloat + 5) { pos.y -= 2f; }
+					terraincheck = Time.time + 0.5f;
+				}
 				baseentitybe.transform.position = pos;
 				baseentitybe.transform.rotation = Quaternion.LookRotation(newDir);
-                plane.transform.position = baseentitybe.transform.position;
+				plane.transform.position = baseentitybe.transform.position;
 				plane.transform.rotation = baseentitybe.transform.rotation;
 			}
 
@@ -5199,7 +5202,7 @@ namespace Oxide.Plugins
 						plugin.BaseParts.Add(itembox.net.ID);
 						plugin.timer.Once(10f, () =>
 						{
-							foreach (ScientistNPC npc in npcs) { plugin.BailOutfunction(_base.transform.position + new Vector3(0, 3, 0), npc, Vector3.zero, _ServerSettings.PirateBaseWallRadius - 3, 5.5f, false); }
+							foreach (ScientistNPC npc in npcs) { plugin.BailOutfunction(_base.transform.position + new Vector3(0, 4, 0), npc, Vector3.zero, _ServerSettings.PirateBaseWallRadius - 3, 5.5f, false); }
 							foreach (BaseEntity be in entitys)
 							{
 								if (be == null || be.net == null) { continue; }
@@ -5330,7 +5333,7 @@ namespace Oxide.Plugins
 					}
 				}
 				catch { }
-				try{if (_base != null && !_base.IsDestroyed) { _base.Kill(); }}catch { }
+				try { if (_base != null && !_base.IsDestroyed) { _base.Kill(); } } catch { }
 			}
 
 			public void Die() { if (this != null) { Destroy(this); } }
