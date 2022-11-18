@@ -73,8 +73,8 @@ namespace Oxide.Plugins
         private const string windowprefab = "assets/prefabs/building/wall.window.reinforcedglass/wall.window.glass.reinforced.prefab";
         private const string wallframeprefab = "assets/prefabs/building core/wall.frame/wall.frame.prefab";
         private const string garagedoorprefab = "assets/prefabs/building/wall.frame.garagedoor/wall.frame.garagedoor.prefab";
-        private const string workcartprefab = "assets/content/vehicles/workcart/workcart_aboveground.entity.prefab";
-        private const string wagonentsprefab = "assets/content/vehicles/train/trainwagon$.entity.prefab";
+        private const string workcartprefab = "assets/content/vehicles/trains/workcart/workcart_aboveground.entity.prefab";
+        private const string wagonentsprefab = "assets/content/vehicles/trains/wagons/trainwagon$.entity.prefab";
         private const string codelockprefab = "assets/prefabs/locks/keypad/lock.code.prefab";
         private const string autoturretprefab = "assets/prefabs/npc/autoturret/autoturret_deployed.prefab";
         private const string samsiteprefab = "assets/prefabs/npc/sam_site_turret/sam_site_turret_deployed.prefab";
