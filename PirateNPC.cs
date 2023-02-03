@@ -14,11 +14,13 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
+using Physics = UnityEngine.Physics;
+using Pool = Facepunch.Pool;
 using Time = UnityEngine.Time;
 
 namespace Oxide.Plugins
 {
-    [Info("PirateNPC", "bmgjet", "0.0.4")]
+    [Info("PirateNPC", "bmgjet", "0.0.5")]
     [Description("Creates NPC To Patrol Ocean,Skies and Land")]
     class PirateNPC : RustPlugin
     {
@@ -614,10 +616,10 @@ namespace Oxide.Plugins
             Config["NPCs Parachute Decay (sec)"] = 30f;
             Config["NPCs Parachute Suicide (sec)"] = 600f;
             Config["NPCs Radio Disable"] = false;
-            Config["NPCs Radio Custom"] = "";
-            Config["NPCs Custom Kill Voice"] = "";
-            Config["NPCs Custom Death Voice"] = "";
-            Config["NPCs Custom Warning Voice"] = "";
+            Config["NPCs Radio Custom"] = "http://192.168.1.183:9000/?Voice=radio";
+            Config["NPCs Custom Kill Voice"] = "http://192.168.1.183:9000/?Voice=kill";
+            Config["NPCs Custom Death Voice"] = "http://192.168.1.183:9000/?Voice=death";
+            Config["NPCs Custom Warning Voice"] = "http://192.168.1.183:9000/?Voice=warning";
             Config["NPCs Radio Custom Cooldown"] = 10;
             Config["NPCs Custom Death VoiceCooldown"] = 8;
             Config["NPCs Custom Kill Voice Cooldown"] = 8;
@@ -970,7 +972,7 @@ namespace Oxide.Plugins
 
         private object OnSamSiteTarget(SamSite samsite, SamSite.ISamSiteTarget target)
         {
-            if (!_ServerSettings.StaticSamSitesBool) { foreach (uint id in PirateUintList) { if (target.ToString().Contains(id.ToString())) { return false; } } }
+            if (!_ServerSettings.StaticSamSitesBool) { foreach (uint id in PirateUintList) { if (target.ToString().Contains(id.ToString())) { return true; } } }
             return null;
         }
 
@@ -1009,10 +1011,11 @@ namespace Oxide.Plugins
             return null;
         }
 
-        private void OnPlayerDeath(BasePlayer player, HitInfo info)
+        object OnPlayerDeath(BasePlayer player, HitInfo info)
         {
-            if (player == null || player.net == null) { return; }
+            if (player == null || player.net == null) { return null; }
             if (NPCsUintList.Contains(player.net.ID) || GroundedNPCs.Contains(player.net.ID)) { CoolDownUintList.Remove(player.net.ID); foreach (BaseEntity be in player.children.ToArray()) { if (be == null) { continue; } be.SetParent(null, true, true); if (be.ToString().Contains("parachute")) { be.Kill(); } if (be is SearchLight) { be.Kill(); } } }
+            return null;
         }
 
         private void OnEntityDeath(BaseCombatEntity entity, HitInfo info)
@@ -1878,12 +1881,13 @@ namespace Oxide.Plugins
             if (VD == null || bot == null) yield break;
             foreach (byte[] data in VD)
             {
-                if (Network.Net.sv.write.Start())
+                if (Network.Net.sv.IsConnected())
                 {
-                    Network.Net.sv.write.PacketID(Message.Type.VoiceData);
-                    Network.Net.sv.write.UInt32(bot.net.ID);
-                    Network.Net.sv.write.BytesWithSize(data);
-                    Network.Net.sv.write.Send(new SendInfo(BaseNetworkable.GetConnectionsWithin(bot.transform.position, 100)) { priority = Priority.Immediate });
+                    NetWrite netWrite = Network.Net.sv.StartWrite();
+                    netWrite.PacketID(Network.Message.Type.VoiceData);
+                    netWrite.UInt32(bot.net.ID);
+                    netWrite.BytesWithSize(data);
+                    netWrite.Send(new SendInfo(BaseNetworkable.GetConnectionsWithin(bot.transform.position, 100)) { priority = Priority.Immediate });
                 }
                 yield return new WaitForSeconds(0.1f);
             }
@@ -1896,18 +1900,6 @@ namespace Oxide.Plugins
                 try { DrawMapfunction(); } catch { }
                 yield return CoroutineEx.waitForSeconds(30);
             } while (true);
-        }
-
-        private IEnumerator Playpacket(byte[] VD, Vector3 position, BasePlayer newPlayer)
-        {
-            if (Network.Net.sv.write.Start())
-            {
-                Network.Net.sv.write.PacketID(Message.Type.VoiceData);
-                Network.Net.sv.write.UInt32(newPlayer.net.ID);
-                Network.Net.sv.write.BytesWithSize(VD);
-                Network.Net.sv.write.Send(new SendInfo(global::BaseNetworkable.GetConnectionsWithin(position, 100f)) { priority = Priority.Immediate });
-            }
-            yield return new WaitForSeconds(0.01f);
         }
 
         private void MarkerDisplayingDelete()
@@ -2255,8 +2247,17 @@ namespace Oxide.Plugins
         private bool collidersbool(Vector3 position)
         {
             List<BuildingBlock> obj = Pool.GetList<BuildingBlock>();
-            Vis.Entities(position, 10, obj, -1);
-            if (obj != null && obj.Count != 0) { return true; }
+            Vis.Entities(position, 6, obj, -1);
+            if (obj != null && obj.Count != 0)
+            {
+                foreach (BuildingBlock b in obj)
+                {
+                    if (b.OwnerID.ToString().Length >= 17)
+                    {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
@@ -2268,7 +2269,7 @@ namespace Oxide.Plugins
                 timer.Once(0.1f, () => { if (npc != null) { GroundCheckfunction(npc, home, Chute); } });
                 return;
             }
-            if (collidersbool(npc.transform.position)) { npc.Die(); }
+            if (collidersbool(npc.transform.position)) { { npc.Die(); } }
             RaycastHit raycastHit;
             if (Physics.SphereCast(npc.transform.position, 3f, Vector3.down, out raycastHit, 5f, -1) || Physics.SphereCast(npc.transform.position, 3f, Vector3.up, out raycastHit, 5f, -1))
             {
@@ -2306,6 +2307,7 @@ namespace Oxide.Plugins
                 npc.SendNetworkUpdateImmediate();
                 NPCsUintList.Remove(npc.net.ID);
                 GroundedNPCs.Add(npc.net.ID);
+                npc.RecoverFromWounded();
                 return;
             }
             if (npc.transform.position.y + 0.5f < TerrainMeta.HeightMap.GetHeight(npc.transform.position))
@@ -2326,7 +2328,7 @@ namespace Oxide.Plugins
                 }
                 return;
             }
-            if (npc.transform.position.y < -1f) { npc.Kill(); return; }
+            if (npc.transform.position.y < TerrainMeta.HeightMap.GetHeight(npc.transform.position) - 2f) { npc.Kill(); return; }
             timer.Once(0.1f, () => { if (npc != null) { GroundCheckfunction(npc, home, Chute); } });
         }
 
@@ -4875,6 +4877,7 @@ namespace Oxide.Plugins
                     plugin.timer.Once(10f, leaveing);
                     return;
                 }
+               plugin.KillWagonsfunction(wagons);
                 Die();
             }
 
@@ -5119,8 +5122,13 @@ namespace Oxide.Plugins
                 }
                 else
                 {
+
                     droppoint = droppoints.Keys.ToList().GetRandom();
                     if (droppoints[droppoint] == true) { CanDropNext = true; }
+                    if (droppoints.Count == 1)
+                    {
+                        droppoints.Add(new Vector3(9000, 900, 9000), false);
+                    }
                     droppoints.Remove(droppoint);
                 }
                 droppoint.y = TerrainMeta.HeightMap.GetHeight(droppoint) + flyheightfloat;
@@ -5196,13 +5204,13 @@ namespace Oxide.Plugins
                     {
                         if (itembox != null) { plugin.filllootfunction(itembox.inventory, -1, _ServerSettings.PirateBaseLootMulti, _ServerSettings.PirateBaseLootString); }
                         List<Vector3> pos = new List<Vector3>();
-                        for (int i = 0; i < _ServerSettings.PirateBaseNPCAmount; i++) { pos.Add(Vector3.zero); }
+                        for (int i = 0; i < _ServerSettings.PirateBaseNPCAmount; i++) { pos.Add(_base.transform.position); }
                         npcs = plugin.CreateNPCs(_ServerSettings.PirateBaseNPCAmount, Type, _ServerSettings.PirateBaseNPCHealth, _ServerSettings.PirateBaseNPCKit, _ServerSettings.PirateBaseAimMulti, _base, pos);
                         if (npcs == null) { _base.Kill(); }
                         plugin.BaseParts.Add(itembox.net.ID);
-                        plugin.timer.Once(10f, () =>
+                        plugin.timer.Once(1f, () =>
                         {
-                            foreach (ScientistNPC npc in npcs) { plugin.BailOutfunction(_base.transform.position + new Vector3(0, 3, 0), npc, Vector3.zero, _ServerSettings.PirateBaseWallRadius - 3, 5.5f, false); }
+                            foreach (ScientistNPC npc in npcs) { plugin.BailOutfunction(_base.transform.position + new Vector3(0, 4, 0), npc, Vector3.zero, _ServerSettings.PirateBaseWallRadius - 3, 5.5f, false); }
                             foreach (BaseEntity be in entitys)
                             {
                                 if (be == null || be.net == null) { continue; }
