@@ -616,10 +616,10 @@ namespace Oxide.Plugins
             Config["NPCs Parachute Decay (sec)"] = 30f;
             Config["NPCs Parachute Suicide (sec)"] = 600f;
             Config["NPCs Radio Disable"] = false;
-            Config["NPCs Radio Custom"] = "http://192.168.1.183:9000/?Voice=radio";
-            Config["NPCs Custom Kill Voice"] = "http://192.168.1.183:9000/?Voice=kill";
-            Config["NPCs Custom Death Voice"] = "http://192.168.1.183:9000/?Voice=death";
-            Config["NPCs Custom Warning Voice"] = "http://192.168.1.183:9000/?Voice=warning";
+            Config["NPCs Radio Custom"] = "";
+            Config["NPCs Custom Kill Voice"] = "";
+            Config["NPCs Custom Death Voice"] = "";
+            Config["NPCs Custom Warning Voice"] = "";
             Config["NPCs Radio Custom Cooldown"] = 10;
             Config["NPCs Custom Death VoiceCooldown"] = 8;
             Config["NPCs Custom Kill Voice Cooldown"] = 8;
@@ -4569,7 +4569,7 @@ namespace Oxide.Plugins
                 }
             }
 
-            private void DropLoot() { if (sm != null) { if (itembox != null) { itembox.Drop(buoyantentityprefab, _rideable.transform.position + new Vector3(0, 5, 0), _rideable.ServerRotation); itembox = null; } } }
+            private void DropLoot() { if (sm != null) { if (itembox != null) { itembox.Drop(buoyantentityprefab, _rideable.transform.position + new Vector3(0, 5, 0), _rideable.ServerRotation,0); itembox = null; } } }
 
             void BailOutcall()
             {
