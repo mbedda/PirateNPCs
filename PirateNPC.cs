@@ -20,7 +20,7 @@ using Time = UnityEngine.Time;
 
 namespace Oxide.Plugins
 {
-    [Info("PirateNPC", "bmgjet", "0.0.5")]
+    [Info("PirateNPC", "bmgjet", "0.0.6")]
     [Description("Creates NPC To Patrol Ocean,Skies and Land")]
     class PirateNPC : RustPlugin
     {
@@ -3608,7 +3608,8 @@ namespace Oxide.Plugins
                             Item item = ItemManager.CreateByName("submarine.torpedo.straight", 1, 0);
                             if (item == null) { return; }
                             if (!item.MoveToContainer(_sub.GetTorpedoContainer().inventory, -1, false)) { item.Remove(); }
-                            if (BaseMountable.TryFireProjectile(_sub.GetTorpedoContainer(), AmmoTypes.TORPEDO, _sub.torpedoFiringPoint.position + _sub.torpedoFiringPoint.forward * 2, _sub.torpedoFiringPoint.forward, npcs[0], 1f, minSpeed, out serverProjectile))
+                            BaseMountable mount = npcs[0].GetMounted();
+                            if (mount.TryFireProjectile(_sub.GetTorpedoContainer(), AmmoTypes.TORPEDO, _sub.torpedoFiringPoint.position + _sub.torpedoFiringPoint.forward * 2, _sub.torpedoFiringPoint.forward, npcs[0], 1f, minSpeed, out serverProjectile))
                             {
                                 _sub.timeSinceTorpedoFired = 0f;
                                 _sub.ClientRPC(null, "TorpedoFired");
